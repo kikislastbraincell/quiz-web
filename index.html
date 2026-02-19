@@ -14,7 +14,7 @@
 <div id="leaderboard"></div>
 
 <script>
-const ws = new WebSocket("wss://quiz-web-backend.onrender.com");
+const ws = new WebSocket("wss://quiz-web-backend.onrender.com"); // Use your Render URL
 
 document.getElementById("join").onclick = () => {
   const name = document.getElementById("name").value || "Anonymous";
