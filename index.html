@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h2>Quiz Game</h2>
+<div id="question"></div>
+<div id="options"></div>
+
+<script>
+const ws = new WebSocket("ws://localhost:3000");
+
+ws.onmessage = function(event) {
+  const data = JSON.parse(event.data);
+
+  if (data.type === "QUESTION") {
+    document.getElementById("question").innerText = data.text;
+    const optionsDiv = document.getElementById("options");
+    optionsDiv.innerHTML = "";
+
+    data.options.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.innerText = opt;
+      btn.onclick = () => ws.send(opt[0]);
+      optionsDiv.appendChild(btn);
+    });
+  }
+
+  if (data.type === "GAMEOVER") {
+    document.getElementById("question").innerText = "Game Over";
+  }
+};
+</script>
+</body>
+</html>
