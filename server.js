@@ -25,8 +25,8 @@ function broadcast(msg) {
   clients.forEach(c => c.socket.send(JSON.stringify(msg)));
 }
 
-// Send next question manually
-function sendQuestion() {
+// Send current question to all clients
+function sendCurrentQuestion() {
   if (currentQuestion >= questions.length) {
     broadcast({ type: "GAMEOVER", leaderboard: getLeaderboard() });
     return;
@@ -34,7 +34,6 @@ function sendQuestion() {
 
   const q = questions[currentQuestion];
   broadcast({ type: "QUESTION", text: q.text, options: q.options });
-  currentQuestion++;
 }
 
 // Get sorted leaderboard
@@ -54,13 +53,15 @@ wss.on("connection", (ws) => {
 
     if (data.type === "NAME") {
       player.name = data.name;
-      if (currentQuestion < questions.length) sendQuestion();
+      // Send first question only if game not over
+      sendCurrentQuestion();
     }
 
     if (data.type === "ANSWER") {
-      const q = questions[currentQuestion - 1];
+      const q = questions[currentQuestion];
       if (data.answer === q.correct) player.score += 10;
-      sendQuestion();
+      currentQuestion++; // increment after answer
+      sendCurrentQuestion(); // send next question
     }
   });
 
